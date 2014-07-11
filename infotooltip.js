@@ -45,7 +45,7 @@
       $doc.on('hide-tootlip', this.hideTooltip);
       this.tooltip = $("<div class='general-help-tooltip'>");
       this.interval = null;
-      return $body.append(this.tooltip);
+      return $body.append(this.tooltip.hide());
     };
 
 

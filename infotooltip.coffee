@@ -23,7 +23,7 @@ class InfoTooltip
 		@tooltip = $ "<div class='general-help-tooltip'>"
 		@interval = null
 
-		$body.append @tooltip
+		$body.append @tooltip.hide()
 
 	###
 	Hide tooltip
