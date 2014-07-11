@@ -10,6 +10,13 @@ pos =
 
 class InfoTooltip
 	constructor: ->
+		@init()
+
+	init: =>
+		$doc = $ document
+		$window = $ window
+		$body = $ 'body'
+
 		$doc.on 'mouseenter', '[data-tooltip-text]', @_mouseenter
 		$doc.on 'mouseleave', '[data-tooltip-text]', @hideTooltip
 		$doc.on 'hide-tootlip', @hideTooltip
@@ -66,4 +73,5 @@ class InfoTooltip
 		clearTimeout @interval
 		@interval = setTimeout @showTooltip , 150
 
-module.exports = new InfoTooltip
+tooltip = new InfoTooltip
+$ tooltip.init
