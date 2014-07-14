@@ -20,7 +20,11 @@ class InfoTooltip
 		$doc.on 'mouseenter', '[data-tooltip-text]', @_mouseenter
 		$doc.on 'mouseleave', '[data-tooltip-text]', @hideTooltip
 		$doc.on 'hide-tootlip', @hideTooltip
+
 		@tooltip = $ "<div class='general-help-tooltip'>"
+		@tooltip.append @$nub = $ "<div class=\"nub\">"
+		@tooltip.append @$text = $ "<div class=\"tooltip-text\">"
+
 		@interval = null
 
 		$body.append @tooltip.hide()
@@ -43,20 +47,32 @@ class InfoTooltip
 		showTooltip and= !target.hasClass 'no-tooltip'
 		showTooltip and= !target.attr 'data-no-tooltip'
 		
-		if showTooltip
-			@tooltip.html text
-			$window.on 'resize', @hideTooltip
+		return unless showTooltip
+		@$text.html text
+		$window.on 'resize', @hideTooltip
 
-			@tooltip.show()
-				.css(opacity: 0)
-				.css(@tooltipPosition target, target.attr 'data-tooltip-position')
-				.removeClass('center left right bottom top').addClass(@position)
-				.stop(true, true).transition opacity:1
+		css = @tooltipPosition target, target.attr 'data-tooltip-position'
+
+		@tooltip.show()
+			.css(opacity: 0)
+			.css(css.tooltip)
+			.removeClass('center left right bottom top')
+			.toggleClass(css.classes or '')
+			.stop(true, true).transition opacity: 1
+
+		@$nub.attr('style', '').css css.nub
 
 	tooltipPosition: (@target = @target, position) =>
 		@position = position or @position or 'center top'
+		# return css unless position isnt (css = @target.data 'tooltipPosition').position
+
 		# horizontal & vertical aligniament
-		[h, v] = @position.replace(' ', '-').split '-'
+		unless ~@position.indexOf '%'
+			[h, v] = @position.replace(' ', '-').split '-'
+			classes = @position
+		else
+			[h, v] = @position.split ' '
+
 		{h, v} = h: pos.get(h), v: pos.get v
 
 		offset = target.offset()
@@ -64,7 +80,11 @@ class InfoTooltip
 		top = offset.top + target.outerHeight() * v - @tooltip.outerHeight(false) * (1 - v)
 		left = offset.left + target.outerWidth() * h - @tooltip.outerWidth(false) * (1 - h)
 		
-		{top, left}
+		nub = classes? and {} or left: (offset.left + target.outerWidth()/2 - 4) - left
+		classes ?= offset.top > top and 'top' or 'bottom'
+
+		@target.data 'tooltipPosition', ret = {position, tooltip: {top, left}, nub, classes}
+		ret
 
 	###
 	Trigger the showTooltip on mouse enter

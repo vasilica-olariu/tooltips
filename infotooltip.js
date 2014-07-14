@@ -44,6 +44,8 @@
       $doc.on('mouseleave', '[data-tooltip-text]', this.hideTooltip);
       $doc.on('hide-tootlip', this.hideTooltip);
       this.tooltip = $("<div class='general-help-tooltip'>");
+      this.tooltip.append(this.$nub = $("<div class=\"nub\">"));
+      this.tooltip.append(this.$text = $("<div class=\"tooltip-text\">"));
       this.interval = null;
       return $body.append(this.tooltip.hide());
     };
@@ -69,40 +71,60 @@
     };
 
     InfoTooltip.prototype.showTooltip = function() {
-      var showTooltip, target, text;
+      var css, showTooltip, target, text;
       if (this.e.isDefaultPrevented()) {
         return;
       }
       showTooltip = (text = (target = $(this.e.currentTarget)).attr('data-tooltip-text')).length > 0;
       showTooltip && (showTooltip = !target.hasClass('no-tooltip'));
       showTooltip && (showTooltip = !target.attr('data-no-tooltip'));
-      if (showTooltip) {
-        this.tooltip.html(text);
-        $window.on('resize', this.hideTooltip);
-        return this.tooltip.show().css({
-          opacity: 0
-        }).css(this.tooltipPosition(target, target.attr('data-tooltip-position'))).removeClass('center left right bottom top').addClass(this.position).stop(true, true).transition({
-          opacity: 1
-        });
+      if (!showTooltip) {
+        return;
       }
+      this.$text.html(text);
+      $window.on('resize', this.hideTooltip);
+      css = this.tooltipPosition(target, target.attr('data-tooltip-position'));
+      this.tooltip.show().css({
+        opacity: 0
+      }).css(css.tooltip).removeClass('center left right bottom top').toggleClass(css.classes || '').stop(true, true).transition({
+        opacity: 1
+      });
+      return this.$nub.attr('style', '').css(css.nub);
     };
 
     InfoTooltip.prototype.tooltipPosition = function(target, position) {
-      var h, left, offset, top, v, _ref, _ref1;
+      var classes, h, left, nub, offset, ret, top, v, _ref, _ref1, _ref2;
       this.target = target != null ? target : this.target;
       this.position = position || this.position || 'center top';
-      _ref = this.position.replace(' ', '-').split('-'), h = _ref[0], v = _ref[1];
-      _ref1 = {
+      if (!~this.position.indexOf('%')) {
+        _ref = this.position.replace(' ', '-').split('-'), h = _ref[0], v = _ref[1];
+        classes = this.position;
+      } else {
+        _ref1 = this.position.split(' '), h = _ref1[0], v = _ref1[1];
+      }
+      _ref2 = {
         h: pos.get(h),
         v: pos.get(v)
-      }, h = _ref1.h, v = _ref1.v;
+      }, h = _ref2.h, v = _ref2.v;
       offset = target.offset();
       top = offset.top + target.outerHeight() * v - this.tooltip.outerHeight(false) * (1 - v);
       left = offset.left + target.outerWidth() * h - this.tooltip.outerWidth(false) * (1 - h);
-      return {
-        top: top,
-        left: left
+      nub = (classes != null) && {} || {
+        left: (offset.left + target.outerWidth() / 2 - 4) - left
       };
+      if (classes == null) {
+        classes = offset.top > top && 'top' || 'bottom';
+      }
+      this.target.data('tooltipPosition', ret = {
+        position: position,
+        tooltip: {
+          top: top,
+          left: left
+        },
+        nub: nub,
+        classes: classes
+      });
+      return ret;
     };
 
 
