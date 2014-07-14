@@ -17,8 +17,8 @@ class InfoTooltip
 		$window = $ window
 		$body = $ 'body'
 
-		$doc.on 'mouseenter', '[data-tooltip-text]', @_mouseenter
-		$doc.on 'mouseleave', '[data-tooltip-text]', @hideTooltip
+		$doc.on 'mouseenter', '[data-tooltip-text],[data-tooltip-image]', @_mouseenter
+		$doc.on 'mouseleave', '[data-tooltip-text],[data-tooltip-image]', @hideTooltip
 		$doc.on 'hide-tootlip', @hideTooltip
 
 		@tooltip = $ "<div class='general-help-tooltip'>"
@@ -43,17 +43,20 @@ class InfoTooltip
 	showTooltip: =>
 		return if @e.isDefaultPrevented()
 
-		showTooltip = (text = (target = $ @e.currentTarget).attr 'data-tooltip-text').length > 0
+		img_src = (target = $ @e.currentTarget).attr 'data-tooltip-image'
+		showTooltip = (img_src or text = (target = $ @e.currentTarget).attr 'data-tooltip-text').length > 0
 		showTooltip and= !target.hasClass 'no-tooltip'
 		showTooltip and= !target.attr 'data-no-tooltip'
 		
 		return unless showTooltip
-		@$text.html text
+		@$text.html unless img_src then text else @imgTmpl img_src
 		$window.on 'resize', @hideTooltip
 
+		@tooltip.toggleClass('image-tooltip', !!img_src).css(top: -999, left: -999).show()
 		css = @tooltipPosition target, target.attr 'data-tooltip-position'
 
 		@tooltip.show()
+			.attr('style': '')
 			.css(opacity: 0)
 			.css(css.tooltip)
 			.removeClass('center left right bottom top')
@@ -62,16 +65,17 @@ class InfoTooltip
 
 		@$nub.attr('style', '').css css.nub
 
-	tooltipPosition: (@target = @target, position) =>
-		@position = position or @position or 'center top'
-		# return css unless position isnt (css = @target.data 'tooltipPosition').position
+	imgTmpl: (src) -> "<img src=\"#{src}\" alt=\"#{src}\" class=\"tooltip-image\" />"
+
+	tooltipPosition: (target, position) =>
+		position or= 'center top'
 
 		# horizontal & vertical aligniament
-		unless ~@position.indexOf '%'
-			[h, v] = @position.replace(' ', '-').split '-'
-			classes = @position
+		unless ~position.indexOf '%'
+			[h, v] = position.replace(' ', '-').split '-'
+			classes = position
 		else
-			[h, v] = @position.split ' '
+			[h, v] = position.split ' '
 
 		{h, v} = h: pos.get(h), v: pos.get v
 
@@ -83,7 +87,7 @@ class InfoTooltip
 		nub = classes? and {} or left: (offset.left + target.outerWidth()/2 - 4) - left
 		classes ?= offset.top > top and 'top' or 'bottom'
 
-		@target.data 'tooltipPosition', ret = {position, tooltip: {top, left}, nub, classes}
+		target.data 'tooltipPosition', ret = {position, tooltip: {top, left}, nub, classes}
 		ret
 
 	###

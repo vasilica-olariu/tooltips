@@ -40,8 +40,8 @@
       $doc = $(document);
       $window = $(window);
       $body = $('body');
-      $doc.on('mouseenter', '[data-tooltip-text]', this._mouseenter);
-      $doc.on('mouseleave', '[data-tooltip-text]', this.hideTooltip);
+      $doc.on('mouseenter', '[data-tooltip-text],[data-tooltip-image]', this._mouseenter);
+      $doc.on('mouseleave', '[data-tooltip-text],[data-tooltip-image]', this.hideTooltip);
       $doc.on('hide-tootlip', this.hideTooltip);
       this.tooltip = $("<div class='general-help-tooltip'>");
       this.tooltip.append(this.$nub = $("<div class=\"nub\">"));
@@ -71,20 +71,27 @@
     };
 
     InfoTooltip.prototype.showTooltip = function() {
-      var css, showTooltip, target, text;
+      var css, img_src, showTooltip, target, text;
       if (this.e.isDefaultPrevented()) {
         return;
       }
-      showTooltip = (text = (target = $(this.e.currentTarget)).attr('data-tooltip-text')).length > 0;
+      img_src = (target = $(this.e.currentTarget)).attr('data-tooltip-image');
+      showTooltip = (img_src || (text = (target = $(this.e.currentTarget)).attr('data-tooltip-text'))).length > 0;
       showTooltip && (showTooltip = !target.hasClass('no-tooltip'));
       showTooltip && (showTooltip = !target.attr('data-no-tooltip'));
       if (!showTooltip) {
         return;
       }
-      this.$text.html(text);
+      this.$text.html(!img_src ? text : this.imgTmpl(img_src));
       $window.on('resize', this.hideTooltip);
+      this.tooltip.toggleClass('image-tooltip', !!img_src).css({
+        top: -999,
+        left: -999
+      }).show();
       css = this.tooltipPosition(target, target.attr('data-tooltip-position'));
-      this.tooltip.show().css({
+      this.tooltip.show().attr({
+        'style': ''
+      }).css({
         opacity: 0
       }).css(css.tooltip).removeClass('center left right bottom top').toggleClass(css.classes || '').stop(true, true).transition({
         opacity: 1
@@ -92,15 +99,18 @@
       return this.$nub.attr('style', '').css(css.nub);
     };
 
+    InfoTooltip.prototype.imgTmpl = function(src) {
+      return "<img src=\"" + src + "\" alt=\"" + src + "\" class=\"tooltip-image\" />";
+    };
+
     InfoTooltip.prototype.tooltipPosition = function(target, position) {
       var classes, h, left, nub, offset, ret, top, v, _ref, _ref1, _ref2;
-      this.target = target != null ? target : this.target;
-      this.position = position || this.position || 'center top';
-      if (!~this.position.indexOf('%')) {
-        _ref = this.position.replace(' ', '-').split('-'), h = _ref[0], v = _ref[1];
-        classes = this.position;
+      position || (position = 'center top');
+      if (!~position.indexOf('%')) {
+        _ref = position.replace(' ', '-').split('-'), h = _ref[0], v = _ref[1];
+        classes = position;
       } else {
-        _ref1 = this.position.split(' '), h = _ref1[0], v = _ref1[1];
+        _ref1 = position.split(' '), h = _ref1[0], v = _ref1[1];
       }
       _ref2 = {
         h: pos.get(h),
@@ -115,7 +125,7 @@
       if (classes == null) {
         classes = offset.top > top && 'top' || 'bottom';
       }
-      this.target.data('tooltipPosition', ret = {
+      target.data('tooltipPosition', ret = {
         position: position,
         tooltip: {
           top: top,
