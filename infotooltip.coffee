@@ -73,19 +73,22 @@ class InfoTooltip
 		# horizontal & vertical aligniament
 		unless ~position.indexOf '%'
 			[h, v] = position.replace(' ', '-').split '-'
-			classes = position
+			classes = h
 		else
 			[h, v] = position.split ' '
 
 		{h, v} = h: pos.get(h), v: pos.get v
 
 		offset = target.offset()
-		
+
 		top = offset.top + target.outerHeight() * v - @tooltip.outerHeight(false) * (1 - v)
 		left = offset.left + target.outerWidth() * h - @tooltip.outerWidth(false) * (1 - h)
+
+		if top < (wst = $window.scrollTop())
+			top = offset.top + target.outerHeight() * 1-v - @tooltip.outerHeight(false) * v
 		
 		nub = classes? and {} or left: (offset.left + target.outerWidth()/2 - 4) - left
-		classes ?= offset.top > top and 'top' or 'bottom'
+		classes += ' ' + (offset.top > top and 'top' or 'bottom')
 
 		target.data 'tooltipPosition', ret = {position, tooltip: {top, left}, nub, classes}
 		ret
