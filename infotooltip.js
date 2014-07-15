@@ -104,11 +104,14 @@
     };
 
     InfoTooltip.prototype.tooltipPosition = function(target, position) {
-      var classes, h, left, nub, offset, ret, top, v, wst, _ref, _ref1, _ref2;
+      var class_h, class_v, classes, h, left, nub, offset, ret, top, v, wst, _ref, _ref1, _ref2;
       position || (position = 'center top');
       if (!~position.indexOf('%')) {
         _ref = position.replace(' ', '-').split('-'), h = _ref[0], v = _ref[1];
-        classes = h;
+        class_h = h;
+        if (v === 'center') {
+          class_v = v;
+        }
       } else {
         _ref1 = position.split(' '), h = _ref1[0], v = _ref1[1];
       }
@@ -122,10 +125,10 @@
       if (top < (wst = $window.scrollTop())) {
         top = offset.top + target.outerHeight() * 1 - v - this.tooltip.outerHeight(false) * v;
       }
-      nub = (classes != null) && {} || {
+      nub = (typeof classes !== "undefined" && classes !== null) && {} || {
         left: (offset.left + target.outerWidth() / 2 - 4) - left
       };
-      classes += ' ' + (offset.top > top && 'top' || 'bottom');
+      classes = class_h + ' ' + (class_v || (offset.top > top && 'top' || 'bottom'));
       target.data('tooltipPosition', ret = {
         position: position,
         tooltip: {

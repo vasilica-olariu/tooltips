@@ -73,7 +73,8 @@ class InfoTooltip
 		# horizontal & vertical aligniament
 		unless ~position.indexOf '%'
 			[h, v] = position.replace(' ', '-').split '-'
-			classes = h
+			class_h = h
+			class_v = v if v is 'center'
 		else
 			[h, v] = position.split ' '
 
@@ -88,7 +89,7 @@ class InfoTooltip
 			top = offset.top + target.outerHeight() * 1-v - @tooltip.outerHeight(false) * v
 		
 		nub = classes? and {} or left: (offset.left + target.outerWidth()/2 - 4) - left
-		classes += ' ' + (offset.top > top and 'top' or 'bottom')
+		classes = class_h + ' ' + (class_v or (offset.top > top and 'top' or 'bottom'))
 
 		target.data 'tooltipPosition', ret = {position, tooltip: {top, left}, nub, classes}
 		ret
