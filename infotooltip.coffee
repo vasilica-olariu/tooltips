@@ -7,6 +7,7 @@ pos =
 	get: (p) ->
 		return r if (r = @[p])?
 		return parseInt(p)/100 if ~p.indexOf '%'
+	classes: 'center left right bottom top'
 
 class InfoTooltip
 	constructor: ->
@@ -59,15 +60,15 @@ class InfoTooltip
 			.attr('style': '')
 			.css(opacity: 0)
 			.css(css.tooltip)
-			.removeClass('center left right bottom top')
-			.toggleClass(css.classes or '')
+			.removeClass(pos.classes)
+			.addClass(css.classes or '')
 			.stop(true, true).transition opacity: 1
 
 		@$nub.attr('style', '').css css.nub
 
 	imgTmpl: (src) -> "<img src=\"#{src}\" alt=\"#{src}\" class=\"tooltip-image\" />"
 
-	tooltipPosition: (target, position) =>
+	tooltipPosition: (target, position, ret) =>
 		position or= 'center top'
 
 		# horizontal & vertical aligniament
@@ -82,17 +83,21 @@ class InfoTooltip
 
 		offset = target.offset()
 
-		top = offset.top + target.outerHeight() * v - @tooltip.outerHeight(false) * (1 - v)
-		left = offset.left + target.outerWidth() * h - @tooltip.outerWidth(false) * (1 - h)
+		tooltipOuterHeight = @tooltip.outerHeight(true)
+		top = offset.top + target.outerHeight() * v - tooltipOuterHeight * (1 - v)
+		left = offset.left + target.outerWidth() * h - @tooltip.outerWidth(true) * (1 - h)
 
 		if top < (wst = $window.scrollTop())
-			top = offset.top + target.outerHeight() * 1-v - @tooltip.outerHeight(false) * v
+			top = offset.top + target.outerHeight() * 1-v - tooltipOuterHeight * v
 		
-		nub = classes? and {} or left: (offset.left + target.outerWidth()/2 - 4) - left
+		nub = classes? and {} or left: (offset.left + target.outerWidth()/2 - 4) - left - (tooltipOuterHeight - @tooltip.outerHeight false)/2 + 3
 		classes = class_h + ' ' + (class_v or (offset.top > top and 'top' or 'bottom'))
 
-		target.data 'tooltipPosition', ret = {position, tooltip: {top, left}, nub, classes}
-		ret
+		@tooltip.removeClass(pos.classes).addClass classes
+		
+		return @tooltipPosition ([].slice.call(arguments).concat true)... unless ret?
+
+		{position, tooltip: {top, left}, nub, classes}
 
 	###
 	Trigger the showTooltip on mouse enter

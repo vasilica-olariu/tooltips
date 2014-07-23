@@ -23,7 +23,8 @@
       if (~p.indexOf('%')) {
         return parseInt(p) / 100;
       }
-    }
+    },
+    classes: 'center left right bottom top'
   };
 
   InfoTooltip = (function() {
@@ -93,7 +94,7 @@
         'style': ''
       }).css({
         opacity: 0
-      }).css(css.tooltip).removeClass('center left right bottom top').toggleClass(css.classes || '').stop(true, true).transition({
+      }).css(css.tooltip).removeClass(pos.classes).addClass(css.classes || '').stop(true, true).transition({
         opacity: 1
       });
       return this.$nub.attr('style', '').css(css.nub);
@@ -103,8 +104,8 @@
       return "<img src=\"" + src + "\" alt=\"" + src + "\" class=\"tooltip-image\" />";
     };
 
-    InfoTooltip.prototype.tooltipPosition = function(target, position) {
-      var class_h, class_v, classes, h, left, nub, offset, ret, top, v, wst, _ref, _ref1, _ref2;
+    InfoTooltip.prototype.tooltipPosition = function(target, position, ret) {
+      var class_h, class_v, classes, h, left, nub, offset, tooltipOuterHeight, top, v, wst, _ref, _ref1, _ref2;
       position || (position = 'center top');
       if (!~position.indexOf('%')) {
         _ref = position.replace(' ', '-').split('-'), h = _ref[0], v = _ref[1];
@@ -120,16 +121,21 @@
         v: pos.get(v)
       }, h = _ref2.h, v = _ref2.v;
       offset = target.offset();
-      top = offset.top + target.outerHeight() * v - this.tooltip.outerHeight(false) * (1 - v);
-      left = offset.left + target.outerWidth() * h - this.tooltip.outerWidth(false) * (1 - h);
+      tooltipOuterHeight = this.tooltip.outerHeight(true);
+      top = offset.top + target.outerHeight() * v - tooltipOuterHeight * (1 - v);
+      left = offset.left + target.outerWidth() * h - this.tooltip.outerWidth(true) * (1 - h);
       if (top < (wst = $window.scrollTop())) {
-        top = offset.top + target.outerHeight() * 1 - v - this.tooltip.outerHeight(false) * v;
+        top = offset.top + target.outerHeight() * 1 - v - tooltipOuterHeight * v;
       }
       nub = (typeof classes !== "undefined" && classes !== null) && {} || {
-        left: (offset.left + target.outerWidth() / 2 - 4) - left
+        left: (offset.left + target.outerWidth() / 2 - 4) - left - (tooltipOuterHeight - this.tooltip.outerHeight(false)) / 2 + 3
       };
       classes = class_h + ' ' + (class_v || (offset.top > top && 'top' || 'bottom'));
-      target.data('tooltipPosition', ret = {
+      this.tooltip.removeClass(pos.classes).addClass(classes);
+      if (ret == null) {
+        return this.tooltipPosition.apply(this, [].slice.call(arguments).concat(true));
+      }
+      return {
         position: position,
         tooltip: {
           top: top,
@@ -137,8 +143,7 @@
         },
         nub: nub,
         classes: classes
-      });
-      return ret;
+      };
     };
 
 
