@@ -123,14 +123,14 @@
       offset = target.offset();
       tooltipOuterHeight = this.tooltip.outerHeight(true);
       top = offset.top + target.outerHeight() * v - tooltipOuterHeight * (1 - v);
-      left = offset.left + target.outerWidth() * h - this.tooltip.outerWidth(true) * (1 - h);
+      left = offset.left + target.outerWidth() * h - this.tooltip.outerWidth() * (1 - h);
       if (top < (wst = $window.scrollTop())) {
         top = offset.top + target.outerHeight() * 1 - v - tooltipOuterHeight * v;
       }
       nub = (typeof classes !== "undefined" && classes !== null) && {} || {
         left: (offset.left + target.outerWidth() / 2 - 4) - left - (tooltipOuterHeight - this.tooltip.outerHeight(false)) / 2 + 3
       };
-      classes = class_h + ' ' + (class_v || (offset.top > top && 'top' || 'bottom'));
+      classes = (class_h || '') + ' ' + (class_v || (offset.top > top && 'top' || 'bottom'));
       this.tooltip.removeClass(pos.classes).addClass(classes);
       if (ret == null) {
         return this.tooltipPosition.apply(this, [].slice.call(arguments).concat(true));

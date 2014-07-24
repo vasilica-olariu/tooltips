@@ -85,13 +85,13 @@ class InfoTooltip
 
 		tooltipOuterHeight = @tooltip.outerHeight(true)
 		top = offset.top + target.outerHeight() * v - tooltipOuterHeight * (1 - v)
-		left = offset.left + target.outerWidth() * h - @tooltip.outerWidth(true) * (1 - h)
+		left = offset.left + target.outerWidth() * h - @tooltip.outerWidth() * (1 - h)
 
 		if top < (wst = $window.scrollTop())
 			top = offset.top + target.outerHeight() * 1-v - tooltipOuterHeight * v
 		
 		nub = classes? and {} or left: (offset.left + target.outerWidth()/2 - 4) - left - (tooltipOuterHeight - @tooltip.outerHeight false)/2 + 3
-		classes = class_h + ' ' + (class_v or (offset.top > top and 'top' or 'bottom'))
+		classes = (class_h or '') + ' ' + (class_v or (offset.top > top and 'top' or 'bottom'))
 
 		@tooltip.removeClass(pos.classes).addClass classes
 		
