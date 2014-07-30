@@ -124,6 +124,7 @@
       tooltipOuterHeight = this.tooltip.outerHeight(true);
       top = offset.top + target.outerHeight() * v - tooltipOuterHeight * (1 - v);
       left = offset.left + target.outerWidth() * h - this.tooltip.outerWidth() * (1 - h);
+      left -= Math.max(0, left + this.tooltip.outerWidth(true) - ($window.width() - $window.scrollLeft()));
       if (top < (wst = $window.scrollTop())) {
         top = offset.top + target.outerHeight() * 1 - v - tooltipOuterHeight * v;
       }
