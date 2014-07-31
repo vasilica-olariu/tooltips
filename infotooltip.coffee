@@ -9,6 +9,8 @@ pos =
 		return parseInt(p)/100 if ~p.indexOf '%'
 	classes: 'center left right bottom top'
 
+__delay = (fn, t = 10) -> _delay = null; ->  clearTimeout(_delay); _delay = setTimeout fn, t
+
 class InfoTooltip
 	constructor: ->
 		@init()
@@ -41,6 +43,9 @@ class InfoTooltip
 				$window.off 'resize', @hideTooltip
 		, 150
 
+	checkAndHide: (target) =>
+		do @hideTooltip unless target.is ':visible'
+
 	showTooltip: =>
 		return if @e.isDefaultPrevented()
 
@@ -52,6 +57,10 @@ class InfoTooltip
 		return unless showTooltip
 		@$text.html unless img_src then text else @imgTmpl img_src
 		$window.on 'resize', @hideTooltip
+
+		unless target.data 'has_click_bind'
+			target.bind 'click', __delay @checkAndHide.bind(@, target), 0
+			target.data 'has_click_bind', true
 
 		@tooltip.toggleClass('image-tooltip', !!img_src).css(top: -999, left: -999).show()
 		css = @tooltipPosition target, target.attr 'data-tooltip-position'
