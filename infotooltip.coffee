@@ -37,11 +37,12 @@ class InfoTooltip
 	###
 	hideTooltip : =>
 		clearTimeout @interval
-		@interval = setTimeout =>
-			@tooltip.stop(true, true).transition opacity: 0, duration: 100, =>
-				@tooltip.hide()
-				$window.off 'resize', @hideTooltip
-		, 150
+		@interval = setTimeout @_hideTooltip, 150
+
+	_hideTooltip: =>
+		@tooltip.stop(true, true).transition opacity: 0, duration: 100, =>
+			@tooltip.hide()
+			$window.off 'resize', @hideTooltip
 
 	checkAndHide: (target) =>
 		do @hideTooltip unless target.is ':visible'
@@ -57,8 +58,12 @@ class InfoTooltip
 		return unless showTooltip
 
 		unless img_src and img_src is @img_src
-			@$text.html unless img_src then text else @imgTmpl img_src
-			return @loadImage().then @showTooltip unless @imageLoaded()
+			if @img_src = img_src
+				@_hideTooltip()
+				@$text.html @imgTmpl img_src
+				return @loadImage().then @showTooltip unless @imageLoaded()
+			else @$text.html text
+
 		$window.on 'resize', @hideTooltip
 
 		unless target.data 'has_click_bind'
@@ -78,7 +83,7 @@ class InfoTooltip
 
 		@$nub.attr('style', '').css css.nub
 
-	imgTmpl: (@img_src) -> "<img src=\"#{@img_src}\" alt=\"#{@img_src}\" class=\"tooltip-image\" />"
+	imgTmpl: (src) -> "<img src=\"#{src}\" alt=\"#{src}\" class=\"tooltip-image\" />"
 
 	tooltipPosition: (target, position, ret) =>
 		position or= 'center top'
@@ -128,7 +133,7 @@ class InfoTooltip
 		def.promise()
 
 	imageLoaded: =>
-		@$text.find('img').get(0)?.complete
+		if (img = @$text.find('img').get 0)? then img.complete else true
 
 tooltip = new InfoTooltip
 $ tooltip.init

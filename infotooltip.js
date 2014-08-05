@@ -47,6 +47,7 @@
       this.tooltipPosition = __bind(this.tooltipPosition, this);
       this.showTooltip = __bind(this.showTooltip, this);
       this.checkAndHide = __bind(this.checkAndHide, this);
+      this._hideTooltip = __bind(this._hideTooltip, this);
       this.hideTooltip = __bind(this.hideTooltip, this);
       this.init = __bind(this.init, this);
       this.init();
@@ -73,17 +74,19 @@
 
     InfoTooltip.prototype.hideTooltip = function() {
       clearTimeout(this.interval);
-      return this.interval = setTimeout((function(_this) {
+      return this.interval = setTimeout(this._hideTooltip, 150);
+    };
+
+    InfoTooltip.prototype._hideTooltip = function() {
+      return this.tooltip.stop(true, true).transition({
+        opacity: 0,
+        duration: 100
+      }, (function(_this) {
         return function() {
-          return _this.tooltip.stop(true, true).transition({
-            opacity: 0,
-            duration: 100
-          }, function() {
-            _this.tooltip.hide();
-            return $window.off('resize', _this.hideTooltip);
-          });
+          _this.tooltip.hide();
+          return $window.off('resize', _this.hideTooltip);
         };
-      })(this), 150);
+      })(this));
     };
 
     InfoTooltip.prototype.checkAndHide = function(target) {
@@ -105,9 +108,14 @@
         return;
       }
       if (!(img_src && img_src === this.img_src)) {
-        this.$text.html(!img_src ? text : this.imgTmpl(img_src));
-        if (!this.imageLoaded()) {
-          return this.loadImage().then(this.showTooltip);
+        if (this.img_src = img_src) {
+          this._hideTooltip();
+          this.$text.html(this.imgTmpl(img_src));
+          if (!this.imageLoaded()) {
+            return this.loadImage().then(this.showTooltip);
+          }
+        } else {
+          this.$text.html(text);
         }
       }
       $window.on('resize', this.hideTooltip);
@@ -130,9 +138,8 @@
       return this.$nub.attr('style', '').css(css.nub);
     };
 
-    InfoTooltip.prototype.imgTmpl = function(img_src) {
-      this.img_src = img_src;
-      return "<img src=\"" + this.img_src + "\" alt=\"" + this.img_src + "\" class=\"tooltip-image\" />";
+    InfoTooltip.prototype.imgTmpl = function(src) {
+      return "<img src=\"" + src + "\" alt=\"" + src + "\" class=\"tooltip-image\" />";
     };
 
     InfoTooltip.prototype.tooltipPosition = function(target, position, ret) {
@@ -200,8 +207,12 @@
     };
 
     InfoTooltip.prototype.imageLoaded = function() {
-      var _ref;
-      return (_ref = this.$text.find('img').get(0)) != null ? _ref.complete : void 0;
+      var img;
+      if ((img = this.$text.find('img').get(0)) != null) {
+        return img.complete;
+      } else {
+        return true;
+      }
     };
 
     return InfoTooltip;
