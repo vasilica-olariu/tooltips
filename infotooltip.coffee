@@ -55,7 +55,10 @@ class InfoTooltip
 		showTooltip and= !target.attr 'data-no-tooltip'
 		
 		return unless showTooltip
-		@$text.html unless img_src then text else @imgTmpl img_src
+
+		unless img_src and img_src is @img_src
+			@$text.html unless img_src then text else @imgTmpl img_src
+			return @loadImage().then @showTooltip unless @imageLoaded()
 		$window.on 'resize', @hideTooltip
 
 		unless target.data 'has_click_bind'
@@ -75,7 +78,7 @@ class InfoTooltip
 
 		@$nub.attr('style', '').css css.nub
 
-	imgTmpl: (src) -> "<img src=\"#{src}\" alt=\"#{src}\" class=\"tooltip-image\" />"
+	imgTmpl: (@img_src) -> "<img src=\"#{@img_src}\" alt=\"#{@img_src}\" class=\"tooltip-image\" />"
 
 	tooltipPosition: (target, position, ret) =>
 		position or= 'center top'
@@ -115,6 +118,17 @@ class InfoTooltip
 	_mouseenter : (@e) =>
 		clearTimeout @interval
 		@interval = setTimeout @showTooltip , 150
+
+	loadImage: =>
+		def = new $.Deferred
+
+		def.resolve() if @imageLoaded()
+		@$text.find('img').bind 'load', def.resolve.bind def
+
+		def.promise()
+
+	imageLoaded: =>
+		@$text.find('img').get(0)?.complete
 
 tooltip = new InfoTooltip
 $ tooltip.init

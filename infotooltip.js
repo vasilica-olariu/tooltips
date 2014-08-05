@@ -41,6 +41,8 @@
 
   InfoTooltip = (function() {
     function InfoTooltip() {
+      this.imageLoaded = __bind(this.imageLoaded, this);
+      this.loadImage = __bind(this.loadImage, this);
       this._mouseenter = __bind(this._mouseenter, this);
       this.tooltipPosition = __bind(this.tooltipPosition, this);
       this.showTooltip = __bind(this.showTooltip, this);
@@ -102,7 +104,12 @@
       if (!showTooltip) {
         return;
       }
-      this.$text.html(!img_src ? text : this.imgTmpl(img_src));
+      if (!(img_src && img_src === this.img_src)) {
+        this.$text.html(!img_src ? text : this.imgTmpl(img_src));
+        if (!this.imageLoaded()) {
+          return this.loadImage().then(this.showTooltip);
+        }
+      }
       $window.on('resize', this.hideTooltip);
       if (!target.data('has_click_bind')) {
         target.bind('click', __delay(this.checkAndHide.bind(this, target), 0));
@@ -123,8 +130,9 @@
       return this.$nub.attr('style', '').css(css.nub);
     };
 
-    InfoTooltip.prototype.imgTmpl = function(src) {
-      return "<img src=\"" + src + "\" alt=\"" + src + "\" class=\"tooltip-image\" />";
+    InfoTooltip.prototype.imgTmpl = function(img_src) {
+      this.img_src = img_src;
+      return "<img src=\"" + this.img_src + "\" alt=\"" + this.img_src + "\" class=\"tooltip-image\" />";
     };
 
     InfoTooltip.prototype.tooltipPosition = function(target, position, ret) {
@@ -179,6 +187,21 @@
       this.e = e;
       clearTimeout(this.interval);
       return this.interval = setTimeout(this.showTooltip, 150);
+    };
+
+    InfoTooltip.prototype.loadImage = function() {
+      var def;
+      def = new $.Deferred;
+      if (this.imageLoaded()) {
+        def.resolve();
+      }
+      this.$text.find('img').bind('load', def.resolve.bind(def));
+      return def.promise();
+    };
+
+    InfoTooltip.prototype.imageLoaded = function() {
+      var _ref;
+      return (_ref = this.$text.find('img').get(0)) != null ? _ref.complete : void 0;
     };
 
     return InfoTooltip;
