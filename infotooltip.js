@@ -109,9 +109,9 @@
       }
       if (!(img_src && img_src === this.img_src)) {
         if (this.img_src = img_src) {
-          this._hideTooltip();
           this.$text.html(this.imgTmpl(img_src));
           if (!this.imageLoaded()) {
+            this._hideTooltip();
             return this.loadImage().then(this.showTooltip);
           }
         } else {

@@ -59,9 +59,11 @@ class InfoTooltip
 
 		unless img_src and img_src is @img_src
 			if @img_src = img_src
-				@_hideTooltip()
 				@$text.html @imgTmpl img_src
-				return @loadImage().then @showTooltip unless @imageLoaded()
+
+				unless @imageLoaded()
+					@_hideTooltip()
+					return @loadImage().then @showTooltip
 			else @$text.html text
 
 		$window.on 'resize', @hideTooltip
