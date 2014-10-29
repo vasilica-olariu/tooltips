@@ -168,7 +168,7 @@
         top = offset.top + target.outerHeight() * 1 - v - tooltipOuterHeight * v;
       }
       nub = (typeof classes !== "undefined" && classes !== null) && {} || {
-        left: (offset.left + target.outerWidth() / 2 - 4) - left - (tooltipOuterHeight - this.tooltip.outerHeight(false)) / 2 + 3
+        left: (offset.left + target.outerWidth() / 2) - left - (tooltipOuterHeight - this.tooltip.outerHeight(false)) / 2 + 3
       };
       classes = (class_h || '') + ' ' + (class_v || (offset.top > top && 'top' || 'bottom'));
       this.tooltip.removeClass(pos.classes).addClass(classes);
