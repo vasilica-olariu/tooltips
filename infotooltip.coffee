@@ -54,6 +54,7 @@ class InfoTooltip
 		showTooltip = (img_src or text = (target = $ @e.currentTarget).attr 'data-tooltip-text').length > 0
 		showTooltip and= !target.hasClass 'no-tooltip'
 		showTooltip and= !target.attr 'data-no-tooltip'
+		@tooltip.removeClass(@customClass).addClass @customClass = target.data 'tooltip-class'
 		
 		return unless showTooltip
 

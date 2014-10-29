@@ -104,6 +104,7 @@
       showTooltip = (img_src || (text = (target = $(this.e.currentTarget)).attr('data-tooltip-text'))).length > 0;
       showTooltip && (showTooltip = !target.hasClass('no-tooltip'));
       showTooltip && (showTooltip = !target.attr('data-no-tooltip'));
+      this.tooltip.removeClass(this.customClass).addClass(this.customClass = target.data('tooltip-class'));
       if (!showTooltip) {
         return;
       }
