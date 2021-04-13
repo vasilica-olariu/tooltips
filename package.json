@@ -1,0 +1,22 @@
+{
+  "name": "tooltips",
+  "version": "1.0.0",
+  "description": "tooltips for widgetic editor",
+  "main": "infotooltip.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vasilica-olariu/tooltips.git"
+  },
+  "keywords": [
+    "tooltip"
+  ],
+  "author": "Widgetic",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/vasilica-olariu/tooltips/issues"
+  },
+  "homepage": "https://github.com/vasilica-olariu/tooltips#readme"
+}
